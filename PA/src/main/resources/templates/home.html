@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moda Elite - Inicio</title>
+     <link rel="icon" href="../static/img/deposito.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        /* Header y Navegación */
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links a.login-btn {
+            background-color: #167abd;
+            border-radius: 20px;
+        }
+
+        .nav-links a.login-btn:hover {
+            background-color: #064c7a;
+        }
+
+        
+
+        /* Hero Section */
+        .hero {
+            background-position: center 20%;
+            background-image: url(../static/img/ventas.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            color: rgb(255, 255, 255);
+            padding: 150px 2rem 100px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease 0.2s backwards;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeInUp 1s ease 0.4s backwards;
+            margin: 0 10px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background: #2980b9;
+        }
+
+        .cta-button.secondary {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeInUp 1s ease 0.4s backwards;
+            margin: 0 10px;
+        }
+
+        .cta-button.secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background: #2980b9;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        /* Category Selector */
+        .category-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .products-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-details {
+            padding: 1rem;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .product-price {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 1rem;
+        }
+
+        .view-product-btn {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .view-product-btn:hover {
+            background: #1a252f;
+        }
+
+        /* Category Products Section */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #1a252f;
+        }
+
+        /* About Section */
+        .about {
+            background: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
+            padding: 80px 2rem;
+        }
+
+        .about-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .about-text p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .about-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 3rem 2rem 1rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #444;
+            color: #999;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .features h2,
+            .about-text h2 {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Cargar productos desde el archivo JSON
+        let allProducts = [];
+        
+        // Función para cargar productos
+        function loadProducts() {
+            fetch('../static/js/productos.json')
+                .then(response => response.json())
+                .then(products => {
+                    allProducts = products;
+                })
+                .catch(error => {
+                    console.error('Error al cargar productos:', error);
+                });
+        }
+        
+        // Función para mostrar productos de una categoría específica
+        function showCategoryProducts(categoryId) {
+            // Obtener el nombre de la categoría
+            const categoryNames = {
+                'camisetas': 'Camisetas',
+                'pantalones': 'Pantalones',
+                'abrigos': 'Abrigos'
+            };
+            
+            // Filtrar productos por categoría
+            const filteredProducts = allProducts.filter(product => product.categoria.id === categoryId);
+            
+            // Actualizar título
+            document.getElementById('category-title').textContent = categoryNames[categoryId] || 'Productos';
+            
+            // Mostrar productos en el contenedor
+            displayCategoryProducts(filteredProducts);
+            
+            // Ocultar sección de categorías y mostrar productos
+            document.getElementById('categorias').style.display = 'none';
+            document.getElementById('category-products').style.display = 'block';
+            document.getElementById('productos').style.display = 'none';
+        }
+        
+        // Función para ocultar productos y volver a categorías
+        function hideCategoryProducts() {
+            document.getElementById('categorias').style.display = 'block';
+            document.getElementById('category-products').style.display = 'none';
+            document.getElementById('productos').style.display = 'block';
+        }
+        
+        // Función para mostrar productos en el contenedor de categoría
+        function displayCategoryProducts(products) {
+            const container = document.getElementById('category-products-container');
+            container.innerHTML = '';
+            
+            if (products.length === 0) {
+                container.innerHTML = '<p class="no-products">No se encontraron productos en esta categoría.</p>';
+                return;
+            }
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img class="product-image" src="../static${product.imagen}" alt="${product.titulo}">
+                    <div class="product-details">
+                        <h3 class="product-title">${product.titulo}</h3>
+                        <p class="product-price">$${product.precio}</p>
+                    </div>
+                `;
+                container.appendChild(productCard);
+            });
+        }
+        
+        // Cargar productos cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+        });
+    </script>
+    <!-- Header -->
+    <header>
+        <nav>
+            <img src="../static/img/deposito.png" alt="Logo" style="height: 40px; margin-right: 1rem;">
+            <div class="logo">Moda Elite</div>
+            <ul class="nav-links">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#categorias">Productos</a></li>
+                <li><a href="#nosotros">Nosotros</a></li>
+            
+                <li><a href="/inicioSesion" class="login-btn">Iniciar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="inicio">
+        <h1>Bienvenido a Moda Elite</h1>
+        <p>La mejor moda al alcance de tu mano</p>
+        <div>
+            <a href="/inicioSesion.html" class="cta-button">Iniciar Sesión</a>
+            <a href="/registro" class="cta-button secondary">Registrarse</a>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="features" id="categorias">
+        <h2>Nuestras Categorías</h2>
+        <div class="features-grid">
+            <div class="feature-card" onclick="showCategoryProducts('camisetas')">
+                <div class="feature-icon">👕</div>
+                <h3>Camisetas</h3>
+                <p>Descubre nuestra amplia variedad de camisetas de alta calidad.</p>
+            </div>
+            <div class="feature-card" onclick="showCategoryProducts('pantalones')">
+                <div class="feature-icon">👖</div>
+                <h3>Pantalones</h3>
+                <p>Pantalones elegantes y cómodos para cualquier ocasión.</p>
+            </div>
+            <div class="feature-card" onclick="showCategoryProducts('abrigos')">
+                <div class="feature-icon">🧥</div>
+                <h3>Abrigos</h3>
+                <p>Abrigos premium para mantenerte abrigado con estilo.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Category Products Section -->
+    <section class="features" id="category-products" style="display: none;">
+        <div class="section-header">
+            <h2 id="category-title">Productos</h2>
+            <button class="back-btn" onclick="hideCategoryProducts()">← Volver a Categorías</button>
+        </div>
+        <div id="category-products-container" class="products-container">
+            <!-- Products will be loaded here -->
+        </div>
+    </section>
+
+
+
+    <!-- About Section -->
+    <section class="about" id="nosotros">
+        <div class="about-content">
+            <div class="about-text">
+                <h2>Sobre Nosotros</h2>
+                <p>En Moda Elite nos apasiona la moda y creemos que cada persona merece vestir ropa que refleje su estilo único.</p>
+                <p>Desde nuestra fundación en 2020, hemos estado comprometidos en ofrecer prendas de calidad que combinen estilo, comodidad y sostenibilidad.</p>
+                <p>Nuestro equipo de diseñadores y expertos en moda trabajan incansablemente para traerte las últimas tendencias directamente a tu armario.</p>
+            </div>
+            <div class="about-image">
+                👗
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contacto">
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 Moda Elite. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html>

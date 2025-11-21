@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro - Moda Elite</title>
+  <link rel="stylesheet" href="/css/registro.css"/>
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Toastify -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Crear cuenta</h2>
+    <form id="formRegistro">
+      <input type="text" id="nombre" placeholder="Nombre completo" required />
+      <input type="email" id="emailRegistro" placeholder="Correo electrónico" required />
+      <input type="password" id="passwordRegistro" placeholder="Contraseña" required />
+      <input type="password" id="confirmarPassword" placeholder="Confirmar contraseña" required />
+      <button type="submit">Registrarse</button>
+      <p>¿Ya tienes cuenta? <a href="/inicioSesion">Inicia sesión</a></p>
+    </form>
+  </div>
+  <script src="/js/registro.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</body>
+</html>
