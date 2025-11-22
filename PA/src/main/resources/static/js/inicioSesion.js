@@ -1,14 +1,20 @@
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('Página de inicio de sesión cargada');
-  
-  // Verificar si ya hay una sesión activa
-  const usuarioActual = localStorage.getItem('usuarioActual');
-  if (usuarioActual) {
-    console.log('Usuario ya tiene sesión activa, redirigiendo...');
-    window.location.href = '/home';
-    return;
-  }
-});
+// document.addEventListener('DOMContentLoaded', function() {
+//   console.log('Página de inicio de sesión cargada');
+//   
+//   // Verificar si ya hay una sesión activa
+//   const usuarioActual = localStorage.getItem('usuarioActual');
+//   if (usuarioActual) {
+//     const usuario = JSON.parse(usuarioActual);
+//     console.log('Usuario ya tiene sesión activa, redirigiendo...');
+//     // Redirigir según el rol del usuario
+//     if (usuario.rol === 'administrador') {
+//         window.location.href = '/admin';
+//     } else {
+//         window.location.href = '/home';
+//     }
+//     return;
+//   }
+// });
 
 // Manejar el envío del formulario
 document.getElementById('loginForm').addEventListener('submit', function(event) {
@@ -16,7 +22,9 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
   
   // Mostrar indicador de carga
   const loadingIndicator = document.getElementById('loadingIndicator');
-  loadingIndicator.style.display = 'block';
+  if (loadingIndicator) {
+    loadingIndicator.style.display = 'block';
+  }
   
   // Obtener valores del formulario
   const correo = document.getElementById('correo').value;
@@ -30,7 +38,9 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
           icon: 'warning',
           confirmButtonText: 'Aceptar'
       });
-      loadingIndicator.style.display = 'none';
+      if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+      }
       return;
   }
   
@@ -67,7 +77,9 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
       }
 
       // Ocultar indicador de carga
-      loadingIndicator.style.display = 'none';
+      if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+      }
 
       if (response.status === 200) {
           return responseData;
@@ -78,6 +90,24 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
   }).then(data => {
       console.log('Login exitoso:', data);
       
+      // Validar datos del usuario antes de guardar
+      if (!data || typeof data !== 'object') {
+          console.error('Datos de usuario inválidos:', data);
+          throw new Error('Datos de usuario inválidos');
+      }
+      
+      // Verificar que todos los campos necesarios estén presentes
+      if (!data.id && !data.nombre && !data.correo && !data.rol) {
+          console.error('Datos incompletos del usuario:', data);
+          throw new Error('Datos incompletos del usuario');
+      }
+      
+      // Usar valores por defecto si faltan datos específicos
+      data.id = data.id || '';
+      data.nombre = data.nombre || data.correo || 'Usuario';
+      data.correo = data.correo || '';
+      data.rol = data.rol || 'usuario';
+      
       // Guardar datos del usuario en localStorage y extender sesión
       const usuarioParaGuardar = {
           id: data.id,
@@ -86,28 +116,32 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
           rol: data.rol  // Asegurarse de guardar el rol
       };
 
+      // Guardar siempre en localStorage
+      localStorage.setItem('usuarioActual', JSON.stringify(usuarioParaGuardar));
+      console.log('Usuario guardado en localStorage:', usuarioParaGuardar);
+      
+      // Extender sesión si la función está disponible
       if (window.extenderSesion) {
           window.extenderSesion(usuarioParaGuardar);
-      } else {
-          localStorage.setItem('usuarioActual', JSON.stringify(usuarioParaGuardar));
-          localStorage.setItem('usuarioId', usuarioParaGuardar.id);
-          localStorage.setItem('usuarioNombre', usuarioParaGuardar.nombre);
-          localStorage.setItem('usuarioCorreo', usuarioParaGuardar.correo);
       }
       
       // Mover el contenido hacia abajo cuando aparece la notificación
       const formContainer = document.querySelector('.form-container');
-      formContainer.style.transform = 'translateY(60px)';
-      formContainer.style.transition = 'transform 0.3s ease';
+      if (formContainer) {
+        formContainer.style.transform = 'translateY(60px)';
+        formContainer.style.transition = 'transform 0.3s ease';
+      }
       
       Swal.fire({
           title: '¡Bienvenido!',
-          text: `Hola, ${data.nombre || data.correo}`,
+          text: `Hola, ${data.nombre || data.correo || 'Usuario'}`,
           icon: 'success',
           confirmButtonText: 'Continuar'
       }).then(() => {
           // Volver a la posición original
-          formContainer.style.transform = 'translateY(0)';
+          if (formContainer) {
+            formContainer.style.transform = 'translateY(0)';
+          }
           // Redirigir según el rol del usuario
           if (data.rol === 'administrador') {
               window.location.href = '/admin';
@@ -126,7 +160,9 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
           confirmButtonText: 'Aceptar'
       });
 
-      loadingIndicator.style.display = 'none';
+      if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+      }
   });
 });
 

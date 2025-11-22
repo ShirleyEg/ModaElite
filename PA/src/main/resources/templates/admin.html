@@ -211,6 +211,11 @@
                         </button>
                     </li>
                     <li>
+                        <button id="predictivo" class="boton-menu boton-categoria">
+                            <i class="bi bi-graph-up"></i> Modelo Predictivo
+                        </button>
+                    </li>
+                    <li>
                         <a class="boton-menu boton-historial" href="/home">
                             <i class="bi bi-arrow-left"></i> Volver a la tienda
                         </a>
@@ -233,27 +238,25 @@
                     <p id="admin-welcome">Bienvenido, Administrador</p>
                 </div>
                 
-                <div class="admin-stats">
-                    <div class="stat-card">
-                        <i class="bi bi-people" style="font-size: 2rem; color: #2c3e50;"></i>
-                        <div class="stat-number" id="total-usuarios">0</div>
-                        <div class="stat-label">Usuarios Registrados</div>
-                        <!-- Botones restaurados -->
-                        <div class="admin-actions" style="margin-top: 1rem;">
-                           
+                <!-- Sección de Dashboard -->
+                <div class="admin-section" id="section-dashboard">
+                    <h2 class="section-title">Dashboard</h2>
+                    <div class="admin-stats">
+                        <div class="stat-card">
+                            <i class="bi bi-people" style="font-size: 2rem; color: #2c3e50;"></i>
+                            <div class="stat-number" id="total-usuarios">0</div>
+                            <div class="stat-label">Usuarios Registrados</div>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="bi bi-box" style="font-size: 2rem; color: #2c3e50;"></i>
-                        <div class="stat-number" id="total-productos">0</div>
-                        <div class="stat-label">Productos</div>
-
-                    </div>
-                    <div class="stat-card">
-                        <i class="bi bi-currency-dollar" style="font-size: 2rem; color: #2c3e50;"></i>
-                        <div class="stat-number" id="total-ventas">0</div>
-                        <div class="stat-label">Ventas Realizadas</div>
-
+                        <div class="stat-card">
+                            <i class="bi bi-box" style="font-size: 2rem; color: #2c3e50;"></i>
+                            <div class="stat-number" id="total-productos">0</div>
+                            <div class="stat-label">Productos</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="bi bi-currency-dollar" style="font-size: 2rem; color: #2c3e50;"></i>
+                            <div class="stat-number" id="total-ventas">0</div>
+                            <div class="stat-label">Ventas Realizadas</div>
+                        </div>
                     </div>
                 </div>
                 
@@ -321,6 +324,91 @@
                             <!-- Las ventas se cargarán aquí dinámicamente -->
                         </tbody>
                     </table>
+                </div>
+                
+                <!-- Sección de Modelo Predictivo -->
+                <div class="admin-section" id="section-predictivo" style="display: none;">
+                    <h2 class="section-title">Modelo Predictivo</h2>
+                    <div class="admin-actions" style="margin-bottom: 1rem;">
+                        <button class="admin-btn" id="btn-predecir-ventas">
+                            <i class="bi bi-graph-up"></i> Predecir Ventas
+                        </button>
+                    </div>
+                    
+                    <!-- Métricas del modelo -->
+                    <div class="admin-stats" style="margin-bottom: 2rem;">
+                        <div class="stat-card">
+                            <i class="bi bi-speedometer2" style="font-size: 2rem; color: #2c3e50;"></i>
+                            <div class="stat-number" id="rmse-metric">-</div>
+                            <div class="stat-label">RMSE (Error Cuadrático Medio)</div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="bi bi-bar-chart" style="font-size: 2rem; color: #2c3e50;"></i>
+                            <div class="stat-number" id="correlation-metric">-</div>
+                            <div class="stat-label">Correlación</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulario de predicción -->
+                    <div class="admin-section">
+                        <h3>Predecir Ventas de Prenda</h3>
+                        <form id="prediction-form">
+                            <div class="form-group">
+                                <label for="prediction-date">Fecha:</label>
+                                <input type="date" id="prediction-date" class="search-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="prediction-category">Categoría:</label>
+                                <select id="prediction-category" class="search-input" required>
+                                    <option value="">Seleccione una categoría</option>
+                                    <option value="Shirt">Camisa</option>
+                                    <option value="Pants">Pantalones</option>
+                                    <option value="Dress">Vestido</option>
+                                    <option value="Jacket">Chaqueta</option>
+                                    <option value="Skirt">Falda</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="prediction-size">Talla:</label>
+                                <select id="prediction-size" class="search-input" required>
+                                    <option value="">Seleccione una talla</option>
+                                    <option value="XS">XS</option>
+                                    <option value="S">S</option>
+                                    <option value="M">M</option>
+                                    <option value="L">L</option>
+                                    <option value="XL">XL</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="prediction-color">Color:</label>
+                                <select id="prediction-color" class="search-input" required>
+                                    <option value="">Seleccione un color</option>
+                                    <option value="Red">Rojo</option>
+                                    <option value="Blue">Azul</option>
+                                    <option value="Black">Negro</option>
+                                    <option value="White">Blanco</option>
+                                    <option value="Green">Verde</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="prediction-price">Precio ($):</label>
+                                <input type="number" id="prediction-price" class="search-input" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="prediction-inventory">Inventario:</label>
+                                <input type="number" id="prediction-inventory" class="search-input" min="0" required>
+                            </div>
+                            <button type="submit" class="admin-btn" style="width: 100%; justify-content: center;">
+                                <i class="bi bi-calculator"></i> Predecir Ventas
+                            </button>
+                        </form>
+                        
+                        <!-- Resultado de predicción -->
+                        <div id="prediction-result" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px; display: none;">
+                            <h4>Resultado de Predicción:</h4>
+                            <p id="prediction-value" style="font-size: 1.2rem; font-weight: bold; color: #2c3e50;"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>

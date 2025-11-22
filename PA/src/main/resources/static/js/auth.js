@@ -1,7 +1,22 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Verificar la sesión de usuario con un tiempo de expiración
     const usuarioGuardado = localStorage.getItem("usuarioActual");
-    const sesionInfo = JSON.parse(usuarioGuardado);
+    let sesionInfo = null;
+    
+    // Parsear la información de sesión con validación
+    if (usuarioGuardado) {
+        try {
+            sesionInfo = JSON.parse(usuarioGuardado);
+            // Validar que sesionInfo tenga las propiedades necesarias
+            if (!sesionInfo || typeof sesionInfo !== 'object') {
+                sesionInfo = null;
+            }
+        } catch (e) {
+            console.error('Error al parsear la información de sesión:', e);
+            sesionInfo = null;
+        }
+    }
+    
     const nombreUsuario = document.getElementById("nombreUsuario");
     const loginLink = document.querySelector(".boton-login");
     const logoutItem = document.getElementById("logoutItem");
@@ -18,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (esSesionValida) {
       // Mostrar nombre de usuario
       if (nombreUsuario) {
-        nombreUsuario.textContent = `Hola, ${sesionInfo.nombre || sesionInfo.correo}`;
+        nombreUsuario.textContent = `Hola, ${sesionInfo.nombre || sesionInfo.correo || 'Usuario'}`;
       }
       
       // Ocultar botón de login y mostrar botón de logout
@@ -68,4 +83,3 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Llamar a extenderSesion cuando se inicia sesión
   window.extenderSesion = extenderSesion;
-  

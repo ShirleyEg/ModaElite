@@ -1,6 +1,30 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Verificar si el usuario es administrador
-    verificarAccesoAdmin();
+    // Comentamos temporalmente la verificación para evitar recargas continuas
+    // if (!verificarAccesoAdmin()) {
+    //     // Si no es administrador, no continuar con la inicialización
+    //     return;
+    // }
+    
+    // Verificar acceso de forma más simple
+    const usuarioGuardado = localStorage.getItem("usuarioActual");
+    if (!usuarioGuardado) {
+        // No hay usuario en sesión, redirigir a inicio de sesión
+        // window.location.href = "/inicioSesion";
+        // Mostrar mensaje en consola en lugar de redirigir
+        console.log("No hay usuario en sesión");
+        return;
+    }
+    
+    const usuario = JSON.parse(usuarioGuardado);
+    if (usuario.rol !== "administrador") {
+        // No es administrador, mostrar mensaje en consola
+        console.log("Usuario no es administrador");
+        return;
+    }
+    
+    // Si es administrador, configurar la interfaz
+    document.getElementById('admin-welcome').textContent = `Bienvenido, ${usuario.nombre || usuario.correo}`;
     
     // Configurar botón de cierre de sesión
     const logoutBtn = document.getElementById("logoutBtn");
@@ -17,18 +41,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Configurar navegación entre secciones
     configurarNavegacion();
     
-    // Configurar búsqueda de productos
-    configurarBusquedaProductos();
-    
     // Configurar botones del menú
     configurarBotonesMenu();
     
     // Configurar modal de productos
     configurarModal();
     
+    // Configurar búsqueda de productos
+    configurarBusquedaProductos();
+    
+    // Configurar formulario de predicción
+    configurarFormularioPrediccion();
+    
+    // Mostrar sección de dashboard por defecto
+    mostrarSeccionDashboard();
+    
     // Cargar datos iniciales
     cargarEstadisticas();
-    mostrarSeccionDashboard();
+    cargarUsuarios();
+    cargarProductos();
+    cargarVentas();
 });
 
 function verificarAccesoAdmin() {
@@ -37,7 +69,7 @@ function verificarAccesoAdmin() {
     if (!usuarioGuardado) {
         // No hay usuario en sesión, redirigir a inicio de sesión
         window.location.href = "/inicioSesion";
-        return;
+        return false;
     }
     
     const usuario = JSON.parse(usuarioGuardado);
@@ -61,32 +93,71 @@ function verificarAccesoAdmin() {
             window.location.href = "/home";
         }, 3000);
         
-        return;
+        return false;
     }
     
     // Es administrador, mostrar el panel
     console.log("Acceso de administrador verificado");
     document.getElementById('admin-welcome').textContent = `Bienvenido, ${usuario.nombre || usuario.correo}`;
+    
+    // Devolver true para indicar que el usuario es administrador
+    return true;
 }
 
 // ============ CONFIGURACIÓN DE MENÚ ============
 
 function configurarBotonesMenu() {
-    const btnDashboard = document.getElementById('dashboard');
-    const btnUsuarios = document.getElementById('usuarios');
-    const btnProductos = document.getElementById('productos');
-    const btnVentas = document.getElementById('ventas');
-    const btnNuevoProducto = document.getElementById('btn-nuevo-producto');
-    const btnVerVentas = document.getElementById('btn-ver-ventas');
-    const btnGestionarUsuarios = document.getElementById('btn-gestionar-usuarios');
+    const dashboardBtn = document.getElementById('dashboard');
+    const usuariosBtn = document.getElementById('usuarios');
+    const productosBtn = document.getElementById('productos');
+    const ventasBtn = document.getElementById('ventas');
+    const predictivoBtn = document.getElementById('predictivo');
     
-    if (btnDashboard) btnDashboard.addEventListener('click', mostrarSeccionDashboard);
-    if (btnUsuarios) btnUsuarios.addEventListener('click', mostrarSeccionUsuarios);
-    if (btnProductos) btnProductos.addEventListener('click', mostrarSeccionProductos);
-    if (btnVentas) btnVentas.addEventListener('click', mostrarSeccionVentas);
-    if (btnNuevoProducto) btnNuevoProducto.addEventListener('click', abrirModalProducto);
-    if (btnVerVentas) btnVerVentas.addEventListener('click', mostrarSeccionVentas);
-    if (btnGestionarUsuarios) btnGestionarUsuarios.addEventListener('click', mostrarSeccionUsuarios);
+    if (dashboardBtn) {
+        dashboardBtn.addEventListener('click', function() {
+            mostrarSeccionDashboard();
+            // Activar el botón actual y desactivar los demás
+            document.querySelectorAll('.boton-categoria').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+    }
+    
+    if (usuariosBtn) {
+        usuariosBtn.addEventListener('click', function() {
+            mostrarSeccionUsuarios();
+            // Activar el botón actual y desactivar los demás
+            document.querySelectorAll('.boton-categoria').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+    }
+    
+    if (productosBtn) {
+        productosBtn.addEventListener('click', function() {
+            mostrarSeccionProductos();
+            // Activar el botón actual y desactivar los demás
+            document.querySelectorAll('.boton-categoria').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+    }
+    
+    if (ventasBtn) {
+        ventasBtn.addEventListener('click', function() {
+            mostrarSeccionVentas();
+            // Activar el botón actual y desactivar los demás
+            document.querySelectorAll('.boton-categoria').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+    }
+    
+    // Agregar el evento para el botón de modelo predictivo
+    if (predictivoBtn) {
+        predictivoBtn.addEventListener('click', function() {
+            mostrarSeccionPredictivo();
+            // Activar el botón actual y desactivar los demás
+            document.querySelectorAll('.boton-categoria').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+    }
 }
 
 function configurarNavegacion() {
@@ -106,30 +177,54 @@ function ocultarTodasLasSecciones() {
 
 function mostrarSeccionDashboard() {
     ocultarTodasLasSecciones();
-    document.getElementById('dashboard').classList.add('active');
-    document.getElementById('section-usuarios').style.display = 'block';
+    const dashboardBtn = document.getElementById('dashboard');
+    if (dashboardBtn) {
+        dashboardBtn.classList.add('active');
+    }
+    const sectionDashboard = document.getElementById('section-dashboard');
+    if (sectionDashboard) {
+        sectionDashboard.style.display = 'block';
+    }
     cargarEstadisticas();
     cargarUsuarios();
 }
 
 function mostrarSeccionUsuarios() {
     ocultarTodasLasSecciones();
-    document.getElementById('usuarios').classList.add('active');
-    document.getElementById('section-usuarios').style.display = 'block';
+    const usuariosBtn = document.getElementById('usuarios');
+    if (usuariosBtn) {
+        usuariosBtn.classList.add('active');
+    }
+    const sectionUsuarios = document.getElementById('section-usuarios');
+    if (sectionUsuarios) {
+        sectionUsuarios.style.display = 'block';
+    }
     cargarUsuarios();
 }
 
 function mostrarSeccionProductos() {
     ocultarTodasLasSecciones();
-    document.getElementById('productos').classList.add('active');
-    document.getElementById('section-productos').style.display = 'block';
+    const productosBtn = document.getElementById('productos');
+    if (productosBtn) {
+        productosBtn.classList.add('active');
+    }
+    const sectionProductos = document.getElementById('section-productos');
+    if (sectionProductos) {
+        sectionProductos.style.display = 'block';
+    }
     cargarProductos();
 }
 
 function mostrarSeccionVentas() {
     ocultarTodasLasSecciones();
-    document.getElementById('ventas').classList.add('active');
-    document.getElementById('section-ventas').style.display = 'block';
+    const ventasBtn = document.getElementById('ventas');
+    if (ventasBtn) {
+        ventasBtn.classList.add('active');
+    }
+    const sectionVentas = document.getElementById('section-ventas');
+    if (sectionVentas) {
+        sectionVentas.style.display = 'block';
+    }
     cargarVentas();
 }
 
@@ -141,22 +236,52 @@ function cargarEstadisticas() {
         .then(response => response.json())
         .then(data => {
             if (data.estadisticas) {
-                document.getElementById('total-usuarios').textContent = data.estadisticas.totalUsuarios || '0';
-                document.getElementById('total-productos').textContent = data.estadisticas.totalProductos || '0';
-                document.getElementById('total-ventas').textContent = data.estadisticas.totalVentas || '0';
+                const totalUsuarios = document.getElementById('total-usuarios');
+                const totalProductos = document.getElementById('total-productos');
+                const totalVentas = document.getElementById('total-ventas');
+                
+                if (totalUsuarios) {
+                    totalUsuarios.textContent = data.estadisticas.totalUsuarios || '0';
+                }
+                if (totalProductos) {
+                    totalProductos.textContent = data.estadisticas.totalProductos || '0';
+                }
+                if (totalVentas) {
+                    totalVentas.textContent = data.estadisticas.totalVentas || '0';
+                }
             } else {
                 // Valores por defecto si hay un error
-                document.getElementById('total-usuarios').textContent = '25';
-                document.getElementById('total-productos').textContent = '42';
-                document.getElementById('total-ventas').textContent = '18';
+                const totalUsuarios = document.getElementById('total-usuarios');
+                const totalProductos = document.getElementById('total-productos');
+                const totalVentas = document.getElementById('total-ventas');
+                
+                if (totalUsuarios) {
+                    totalUsuarios.textContent = '25';
+                }
+                if (totalProductos) {
+                    totalProductos.textContent = '42';
+                }
+                if (totalVentas) {
+                    totalVentas.textContent = '18';
+                }
             }
         })
         .catch(error => {
             console.error('Error al cargar estadísticas:', error);
             // Valores por defecto si hay un error
-            document.getElementById('total-usuarios').textContent = '25';
-            document.getElementById('total-productos').textContent = '42';
-            document.getElementById('total-ventas').textContent = '18';
+            const totalUsuarios = document.getElementById('total-usuarios');
+            const totalProductos = document.getElementById('total-productos');
+            const totalVentas = document.getElementById('total-ventas');
+            
+            if (totalUsuarios) {
+                totalUsuarios.textContent = '25';
+            }
+            if (totalProductos) {
+                totalProductos.textContent = '42';
+            }
+            if (totalVentas) {
+                totalVentas.textContent = '18';
+            }
         });
 }
 
@@ -166,7 +291,10 @@ function verUsuarios() {
     mostrarSeccionUsuarios();
     // Activar el botón del menú
     document.querySelectorAll('.boton-categoria').forEach(btn => btn.classList.remove('active'));
-    document.getElementById('usuarios').classList.add('active');
+    const usuariosBtn = document.getElementById('usuarios');
+    if (usuariosBtn) {
+        usuariosBtn.classList.add('active');
+    }
 }
 
 function verProductos() {
@@ -174,7 +302,10 @@ function verProductos() {
     mostrarSeccionProductos();
     // Activar el botón del menú
     document.querySelectorAll('.boton-categoria').forEach(btn => btn.classList.remove('active'));
-    document.getElementById('productos').classList.add('active');
+    const productosBtn = document.getElementById('productos');
+    if (productosBtn) {
+        productosBtn.classList.add('active');
+    }
 }
 
 function agregarProducto() {
@@ -186,7 +317,10 @@ function verVentas() {
     mostrarSeccionVentas();
     // Activar el botón del menú
     document.querySelectorAll('.boton-categoria').forEach(btn => btn.classList.remove('active'));
-    document.getElementById('ventas').classList.add('active');
+    const ventasBtn = document.getElementById('ventas');
+    if (ventasBtn) {
+        ventasBtn.classList.add('active');
+    }
 }
 
 function generarReporte() {
@@ -223,8 +357,10 @@ function cargarUsuarios() {
     fetch('/api/admin/usuarios')
         .then(response => response.json())
         .then(data => {
+            const userListBody = document.getElementById('user-list-body');
+            if (!userListBody) return;
+            
             if (data.usuarios) {
-                const userListBody = document.getElementById('user-list-body');
                 userListBody.innerHTML = '';
                 
                 data.usuarios.forEach(usuario => {
@@ -246,7 +382,6 @@ function cargarUsuarios() {
                 });
             } else {
                 // Mostrar mensaje si no hay usuarios
-                const userListBody = document.getElementById('user-list-body');
                 userListBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No se encontraron usuarios</td></tr>';
             }
         })
@@ -254,7 +389,9 @@ function cargarUsuarios() {
             console.error('Error al cargar usuarios:', error);
             // Mostrar mensaje de error
             const userListBody = document.getElementById('user-list-body');
-            userListBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Error al cargar usuarios</td></tr>';
+            if (userListBody) {
+                userListBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Error al cargar usuarios</td></tr>';
+            }
         });
 }
 
@@ -320,8 +457,10 @@ function cargarProductos() {
     fetch('/api/admin/productos')
         .then(response => response.json())
         .then(data => {
+            const productListBody = document.getElementById('product-list-body');
+            if (!productListBody) return;
+            
             if (data.productos) {
-                const productListBody = document.getElementById('product-list-body');
                 productListBody.innerHTML = '';
                 
                 data.productos.forEach(producto => {
@@ -343,7 +482,6 @@ function cargarProductos() {
                 });
             } else {
                 // Mostrar mensaje si no hay productos
-                const productListBody = document.getElementById('product-list-body');
                 productListBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No se encontraron productos</td></tr>';
             }
         })
@@ -351,7 +489,9 @@ function cargarProductos() {
             console.error('Error al cargar productos:', error);
             // Mostrar mensaje de error
             const productListBody = document.getElementById('product-list-body');
-            productListBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Error al cargar productos</td></tr>';
+            if (productListBody) {
+                productListBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Error al cargar productos</td></tr>';
+            }
         });
 }
 
@@ -379,8 +519,10 @@ function buscarProductos(termino) {
     fetch(`/api/admin/productos`)
         .then(response => response.json())
         .then(data => {
+            const productListBody = document.getElementById('product-list-body');
+            if (!productListBody) return;
+            
             if (data.productos) {
-                const productListBody = document.getElementById('product-list-body');
                 productListBody.innerHTML = '';
                 
                 // Filtrar productos basados en el término de búsqueda
@@ -417,7 +559,9 @@ function buscarProductos(termino) {
         .catch(error => {
             console.error('Error al buscar productos:', error);
             const productListBody = document.getElementById('product-list-body');
-            productListBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Error al buscar productos</td></tr>';
+            if (productListBody) {
+                productListBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Error al buscar productos</td></tr>';
+            }
         });
 }
 
@@ -433,7 +577,9 @@ function configurarModal() {
     
     if (closeModal) {
         closeModal.addEventListener('click', () => {
-            modal.style.display = 'none';
+            if (modal) {
+                modal.style.display = 'none';
+            }
         });
     }
     
@@ -443,17 +589,31 @@ function configurarModal() {
     
     window.addEventListener('click', (event) => {
         if (event.target == modal) {
-            modal.style.display = 'none';
+            if (modal) {
+                modal.style.display = 'none';
+            }
         }
     });
 }
 
 function abrirModalProducto() {
     const modal = document.getElementById('product-modal');
-    document.getElementById('product-form').reset();
-    document.getElementById('product-id').value = '';
-    document.querySelector('.modal-content h2').textContent = 'Crear Nuevo Producto';
-    modal.style.display = 'block';
+    const form = document.getElementById('product-form');
+    const modalTitle = document.querySelector('.modal-content h2');
+    const productId = document.getElementById('product-id');
+    
+    if (form) {
+        form.reset();
+    }
+    if (productId) {
+        productId.value = '';
+    }
+    if (modalTitle) {
+        modalTitle.textContent = 'Crear Nuevo Producto';
+    }
+    if (modal) {
+        modal.style.display = 'block';
+    }
 }
 
 function editarProducto(productoId) {
@@ -462,17 +622,39 @@ function editarProducto(productoId) {
         .then(response => response.json())
         .then(producto => {
             // Llenar el formulario con los datos del producto
-            document.getElementById('product-id').value = producto.id || '';
-            document.getElementById('product-titulo').value = producto.titulo || '';
-            document.getElementById('product-precio').value = producto.precio || '';
-            document.getElementById('product-categoria').value = producto.categoria && producto.categoria.nombre ? producto.categoria.nombre : '';
-            document.getElementById('product-imagen').value = producto.imagen || '';
+            const productId = document.getElementById('product-id');
+            const productTitulo = document.getElementById('product-titulo');
+            const productPrecio = document.getElementById('product-precio');
+            const productCategoria = document.getElementById('product-categoria');
+            const productImagen = document.getElementById('product-imagen');
+            const modalTitle = document.querySelector('.modal-content h2');
+            const modal = document.getElementById('product-modal');
+            
+            if (productId) {
+                productId.value = producto.id || '';
+            }
+            if (productTitulo) {
+                productTitulo.value = producto.titulo || '';
+            }
+            if (productPrecio) {
+                productPrecio.value = producto.precio || '';
+            }
+            if (productCategoria) {
+                productCategoria.value = producto.categoria && producto.categoria.nombre ? producto.categoria.nombre : '';
+            }
+            if (productImagen) {
+                productImagen.value = producto.imagen || '';
+            }
             
             // Cambiar el título del modal
-            document.querySelector('.modal-content h2').textContent = 'Editar Producto';
+            if (modalTitle) {
+                modalTitle.textContent = 'Editar Producto';
+            }
             
             // Mostrar el modal
-            document.getElementById('product-modal').style.display = 'block';
+            if (modal) {
+                modal.style.display = 'block';
+            }
         })
         .catch(error => {
             console.error('Error al cargar producto:', error);
@@ -494,6 +676,8 @@ function guardarProducto(e) {
     
     // Obtener datos del formulario
     const form = document.getElementById('product-form');
+    if (!form) return;
+    
     const formData = new FormData(form);
     
     const producto = {
@@ -504,13 +688,14 @@ function guardarProducto(e) {
     };
     
     // Obtener ID si es una edición
-    const productoId = document.getElementById('product-id').value;
+    const productoId = document.getElementById('product-id');
+    const productIdValue = productoId ? productoId.value : null;
     
     // Determinar si es una creación o actualización
-    const isUpdate = productoId && productoId.trim() !== '';
+    const isUpdate = productIdValue && productIdValue.trim() !== '';
     
     // Configurar la URL y el método HTTP
-    const url = isUpdate ? `/api/admin/productos/${productoId}` : '/api/admin/productos';
+    const url = isUpdate ? `/api/admin/productos/${productIdValue}` : '/api/admin/productos';
     const method = isUpdate ? 'PUT' : 'POST';
     
     // Hacer la llamada al backend
@@ -536,7 +721,10 @@ function guardarProducto(e) {
             }).showToast();
             
             // Cerrar el modal
-            document.getElementById('product-modal').style.display = 'none';
+            const modal = document.getElementById('product-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
             
             // Recargar la lista de productos
             cargarProductos();
@@ -608,8 +796,10 @@ function cargarVentas() {
     fetch('/api/admin/ventas')
         .then(response => response.json())
         .then(data => {
+            const salesListBody = document.getElementById('sales-list-body');
+            if (!salesListBody) return;
+            
             if (data.ventas) {
-                const salesListBody = document.getElementById('sales-list-body');
                 salesListBody.innerHTML = '';
                 
                 data.ventas.forEach(venta => {
@@ -632,7 +822,6 @@ function cargarVentas() {
                 });
             } else {
                 // Mostrar mensaje si no hay ventas
-                const salesListBody = document.getElementById('sales-list-body');
                 salesListBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No se encontraron ventas</td></tr>';
             }
         })
@@ -640,7 +829,9 @@ function cargarVentas() {
             console.error('Error al cargar ventas:', error);
             // Mostrar mensaje de error
             const salesListBody = document.getElementById('sales-list-body');
-            salesListBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Error al cargar ventas</td></tr>';
+            if (salesListBody) {
+                salesListBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Error al cargar ventas</td></tr>';
+            }
         });
 }
 
@@ -655,4 +846,168 @@ function verDetallesVenta(ventaId) {
             background: "#ffc107",
         }
     }).showToast();
+}
+
+// ============ FUNCIONES DE MODELO PREDICTIVO ============
+
+function mostrarSeccionPredictivo() {
+    ocultarTodasLasSecciones();
+    const sectionPredictivo = document.getElementById('section-predictivo');
+    if (sectionPredictivo) {
+        sectionPredictivo.style.display = 'block';
+    }
+    
+    // Cargar métricas del modelo
+    cargarMetricasModelo();
+    
+    // Establecer fecha actual por defecto
+    const predictionDate = document.getElementById('prediction-date');
+    if (predictionDate) {
+        const today = new Date().toISOString().split('T')[0];
+        predictionDate.value = today;
+    }
+}
+
+function cargarMetricasModelo() {
+    // Hacer una llamada AJAX al backend para obtener métricas del modelo
+    fetch('/api/predict/metrics')
+        .then(response => response.json())
+        .then(data => {
+            const rmseMetric = document.getElementById('rmse-metric');
+            const correlationMetric = document.getElementById('correlation-metric');
+            
+            if (data.rmse !== undefined && data.correlation !== undefined) {
+                if (rmseMetric) {
+                    rmseMetric.textContent = data.rmse.toFixed(4);
+                }
+                if (correlationMetric) {
+                    correlationMetric.textContent = data.correlation.toFixed(4);
+                }
+            } else {
+                if (rmseMetric) {
+                    rmseMetric.textContent = 'N/A';
+                }
+                if (correlationMetric) {
+                    correlationMetric.textContent = 'N/A';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar métricas del modelo:', error);
+            const rmseMetric = document.getElementById('rmse-metric');
+            const correlationMetric = document.getElementById('correlation-metric');
+            
+            if (rmseMetric) {
+                rmseMetric.textContent = 'Error';
+            }
+            if (correlationMetric) {
+                correlationMetric.textContent = 'Error';
+            }
+        });
+}
+
+function configurarFormularioPrediccion() {
+    const form = document.getElementById('prediction-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            predecirVentas();
+        });
+    }
+    
+    const btnPredecir = document.getElementById('btn-predecir-ventas');
+    if (btnPredecir) {
+        btnPredecir.addEventListener('click', function() {
+            // Limpiar el formulario y mostrar la sección de predicción
+            const predictionForm = document.getElementById('prediction-form');
+            if (predictionForm) {
+                predictionForm.reset();
+            }
+            const predictionDate = document.getElementById('prediction-date');
+            if (predictionDate) {
+                const today = new Date().toISOString().split('T')[0];
+                predictionDate.value = today;
+            }
+            const predictionResult = document.getElementById('prediction-result');
+            if (predictionResult) {
+                predictionResult.style.display = 'none';
+            }
+        });
+    }
+}
+
+function predecirVentas() {
+    // Obtener datos del formulario
+    const predictionDate = document.getElementById('prediction-date');
+    const predictionCategory = document.getElementById('prediction-category');
+    const predictionSize = document.getElementById('prediction-size');
+    const predictionColor = document.getElementById('prediction-color');
+    const predictionPrice = document.getElementById('prediction-price');
+    const predictionInventory = document.getElementById('prediction-inventory');
+    
+    const formData = {
+        date: predictionDate ? predictionDate.value : '',
+        category: predictionCategory ? predictionCategory.value : '',
+        size: predictionSize ? predictionSize.value : '',
+        color: predictionColor ? predictionColor.value : '',
+        price: predictionPrice ? parseFloat(predictionPrice.value) : NaN,
+        inventory: predictionInventory ? parseInt(predictionInventory.value) : NaN
+    };
+    
+    // Validar que todos los campos estén completos
+    if (!formData.date || !formData.category || !formData.size || !formData.color || 
+        isNaN(formData.price) || isNaN(formData.inventory)) {
+        Toastify({
+            text: "Por favor complete todos los campos del formulario",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "center",
+            style: {
+                background: "#dc3545",
+            }
+        }).showToast();
+        return;
+    }
+    
+    // Mostrar indicador de carga
+    const resultDiv = document.getElementById('prediction-result');
+    const resultValue = document.getElementById('prediction-value');
+    if (resultValue) {
+        resultValue.textContent = "Calculando predicción...";
+    }
+    if (resultDiv) {
+        resultDiv.style.display = 'block';
+    }
+    
+    // Hacer la llamada al backend para obtener la predicción
+    fetch('/api/predict/predict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (resultValue) {
+            if (data.prediction !== undefined) {
+                resultValue.textContent = `Se predicen ${Math.round(data.prediction)} unidades vendidas`;
+                resultValue.style.color = "#28a745";
+            } else if (data.error) {
+                resultValue.textContent = `Error: ${data.error}`;
+                resultValue.style.color = "#dc3545";
+            } else {
+                resultValue.textContent = "Error al obtener la predicción";
+                resultValue.style.color = "#dc3545";
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error al predecir ventas:', error);
+        if (resultValue) {
+            resultValue.textContent = "Error al obtener la predicción";
+            resultValue.style.color = "#dc3545";
+        }
+    });
 }

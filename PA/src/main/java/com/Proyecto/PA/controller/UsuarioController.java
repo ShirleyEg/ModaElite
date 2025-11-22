@@ -14,7 +14,6 @@ import com.Proyecto.PA.repository.UsuarioRepository;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -38,20 +37,9 @@ public class UsuarioController {
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
             
-            // Establecer rol por defecto como "usuario"
-            if (usuario.getRol() == null || usuario.getRol().isEmpty()) {
-                usuario.setRol("usuario");
-            }
-            
-            // Para propósitos de desarrollo, permitir rol de administrador
-            // En producción, esto debería estar protegido
-            if ("admin123".equals(usuario.getPassword()) && "admin@modaelite.com".equals(usuario.getCorreo())) {
-                usuario.setRol("administrador");
-            }
-            
             // Guardar el nuevo usuario
             Usuario nuevoUsuario = usuarioRepository.save(usuario);
-            System.out.println("Usuario registrado: " + nuevoUsuario.getId() + " - " + nuevoUsuario.getCorreo() + " - Rol: " + nuevoUsuario.getRol());
+            System.out.println("Usuario registrado: " + nuevoUsuario.getId() + " - " + nuevoUsuario.getCorreo());
             return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,7 +98,6 @@ public class UsuarioController {
             response.put("id", existente.getId());
             response.put("nombre", existente.getNombre());
             response.put("correo", existente.getCorreo());
-            response.put("rol", existente.getRol());  // Incluir el rol en la respuesta
             
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
@@ -126,37 +113,5 @@ public class UsuarioController {
     @GetMapping("/test")
     public ResponseEntity<String> testConnection() {
         return new ResponseEntity<>("API de usuarios funcionando correctamente", HttpStatus.OK);
-    }
-    
-    @PostMapping("/crear-admin")
-    public ResponseEntity<?> crearAdmin() {
-        try {
-            // Verificar si ya existe un usuario con el correo de administrador
-            Usuario existente = usuarioRepository.findByCorreo("admin@modaelite.com");
-            if (existente != null) {
-                Map<String, String> response = new HashMap<>();
-                response.put("message", "El usuario administrador ya existe");
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-            
-            // Crear usuario administrador
-            Usuario admin = new Usuario();
-            admin.setNombre("Administrador");
-            admin.setCorreo("admin@modaelite.com");
-            admin.setPassword("admin123");
-            admin.setRol("administrador");
-            
-            Usuario nuevoAdmin = usuarioRepository.save(admin);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Usuario administrador creado exitosamente");
-            response.put("usuario", nuevoAdmin);
-            
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (Exception e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("error", "Error al crear usuario administrador: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }
