@@ -13,7 +13,8 @@ public class Usuario {
     private String password;
     private String direccion;
     private String telefono;
-
+    private String rol; // Campo para el rol del usuario
+    
     
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -32,5 +33,8 @@ public class Usuario {
 
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
+    
+    public String getRol() { return rol; }
+    public void setRol(String rol) { this.rol = rol; }
 }
 

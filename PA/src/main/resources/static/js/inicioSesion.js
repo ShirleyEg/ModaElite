@@ -82,7 +82,8 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
       const usuarioParaGuardar = {
           id: data.id,
           nombre: data.nombre,
-          correo: data.correo
+          correo: data.correo,
+          rol: data.rol  // Asegurarse de guardar el rol
       };
 
       if (window.extenderSesion) {
@@ -94,13 +95,25 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
           localStorage.setItem('usuarioCorreo', usuarioParaGuardar.correo);
       }
       
+      // Mover el contenido hacia abajo cuando aparece la notificación
+      const formContainer = document.querySelector('.form-container');
+      formContainer.style.transform = 'translateY(60px)';
+      formContainer.style.transition = 'transform 0.3s ease';
+      
       Swal.fire({
           title: '¡Bienvenido!',
           text: `Hola, ${data.nombre || data.correo}`,
           icon: 'success',
           confirmButtonText: 'Continuar'
       }).then(() => {
-          window.location.href = '/home';
+          // Volver a la posición original
+          formContainer.style.transform = 'translateY(0)';
+          // Redirigir según el rol del usuario
+          if (data.rol === 'administrador') {
+              window.location.href = '/admin';
+          } else {
+              window.location.href = '/home';
+          }
       });
 
   }).catch(error => {

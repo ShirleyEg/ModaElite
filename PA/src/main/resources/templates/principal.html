@@ -14,7 +14,10 @@
 
     <div class="wrapper">
         <header class="header-mobile">
-            <h1 class="logo">Moda Elite</h1>
+            <div style="display: flex; align-items: center;">
+                <img src="/img/deposito.png" alt="Logo" style="height: 30px; margin-right: 0.5rem;">
+                <h1 class="logo" style="margin: 0;">Moda Elite</h1>
+            </div>
             <button class="open-menu" id="open-menu">
                 <i class="bi bi-list"></i>
             </button>
@@ -24,7 +27,10 @@
                 <i class="bi bi-x"></i>
             </button>
             <header>
-                <h1 class="logo">Moda Elite</h1>
+                <div style="display: flex; align-items: center;">
+                    <img src="/img/deposito.png" alt="Logo" style="height: 30px; margin-right: 0.5rem;">
+                    <h1 class="logo" style="margin: 0;">Moda Elite</h1>
+                </div>
             </header>
             <nav>
                 <ul class="menu">
@@ -60,6 +66,11 @@
                         <button class="boton-menu" id="logoutBtn">
                             <i class="bi bi-box-arrow-right"></i> Cerrar sesión
                         </button>
+                    </li>
+                    <li id="adminItem" style="display: none;">
+                        <a class="boton-menu" href="/admin">
+                            <i class="bi bi-shield-lock"></i> Panel Admin
+                        </a>
                     </li>
                 </ul>
             </nav>

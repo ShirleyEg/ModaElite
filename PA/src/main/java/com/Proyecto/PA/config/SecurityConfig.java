@@ -17,6 +17,7 @@ public class SecurityConfig {
             .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**", "/api/productos/**").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
+                .requestMatchers("/inicioSesion", "/registro", "/", "/home").permitAll()
                 .anyRequest().authenticated()
             .and()
             .httpBasic();

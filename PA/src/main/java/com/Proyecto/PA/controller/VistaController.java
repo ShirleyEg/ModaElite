@@ -35,4 +35,9 @@ public class VistaController {
     public String historial() {
         return "historial"; // busca historial.html en /templates
     }
+    
+    @GetMapping("/admin")
+    public String admin() {
+        return "admin"; // busca admin.html en /templates
+    }
 }

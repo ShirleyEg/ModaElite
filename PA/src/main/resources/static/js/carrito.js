@@ -26,7 +26,7 @@ function mostrarCarritoVacio() {
 }
 
 // Cargar productos del carrito desde localStorage
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
     console.log('Cargando carrito...');
     
     // Intentar obtener productos del localStorage
@@ -52,6 +52,56 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }).showToast();
     }
+    
+    // Evento para el selector de fecha (dentro de DOMContentLoaded para asegurar que el elemento exista)
+    document.getElementById("selector-fecha").addEventListener("click", function() {
+        // Crear un calendario personalizado simple
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+        
+        // Crear un mensaje de selección simple
+        let options = '<option value="">Selecciona una fecha</option>';
+        
+        // Generar opciones para los próximos 10 años
+        for (let year = currentYear; year <= currentYear + 10; year++) {
+            for (let month = 1; month <= 12; month++) {
+                // Solo mostrar meses futuros para el año actual
+                if (year === currentYear && month < currentMonth) continue;
+                
+                const monthStr = String(month).padStart(2, '0');
+                const yearStr = String(year).slice(-2);
+                options += `<option value="${monthStr}/${yearStr}">${monthStr}/${yearStr}</option>`;
+            }
+        }
+        
+        // Mostrar selector con SweetAlert
+        Swal.fire({
+            title: 'Selecciona la fecha de expiración',
+            html: `
+                <select id="swal-select-date" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                    ${options}
+                </select>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Seleccionar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const selectedDate = document.getElementById('swal-select-date').value;
+                if (!selectedDate) {
+                    Swal.showValidationMessage('Por favor selecciona una fecha');
+                    return false;
+                }
+                return selectedDate;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById("fecha-exp").value = result.value;
+                // Remover el borde rojo si había un error previo
+                document.getElementById("fecha-exp").style.borderColor = "#ced4da";
+            }
+        });
+    });
 });
 
 function cargarProductosCarrito() {
@@ -239,16 +289,74 @@ btnProcesarPago.addEventListener("click", procesarPago);
 
 function procesarPago() {
     // Obtener valores del formulario
-    const nombreTarjeta = document.getElementById("nombre-tarjeta").value;
-    const numeroTarjeta = document.getElementById("numero-tarjeta").value;
-    const fechaExp = document.getElementById("fecha-exp").value;
-    const cvv = document.getElementById("cvv").value;
+    const nombreTarjeta = document.getElementById("nombre-tarjeta").value.trim();
+    const numeroTarjeta = document.getElementById("numero-tarjeta").value.trim();
+    const fechaExp = document.getElementById("fecha-exp").value.trim();
+    const cvv = document.getElementById("cvv").value.trim();
     
-    // Validaciones básicas
-    if (!nombreTarjeta || !numeroTarjeta || !fechaExp || !cvv) {
+    // Validaciones específicas para cada campo
+    let errores = [];
+    
+    // Validar nombre en la tarjeta
+    if (!nombreTarjeta) {
+        errores.push("El nombre en la tarjeta es obligatorio");
+        document.getElementById("nombre-tarjeta").style.borderColor = "#ff0000";
+    } else {
+        document.getElementById("nombre-tarjeta").style.borderColor = "#ced4da";
+    }
+    
+    // Validar número de tarjeta (16 dígitos)
+    const numeroTarjetaLimpio = numeroTarjeta.replace(/\s/g, '');
+    if (!numeroTarjeta) {
+        errores.push("El número de tarjeta es obligatorio");
+        document.getElementById("numero-tarjeta").style.borderColor = "#ff0000";
+    } else if (!/^\d{16}$/.test(numeroTarjetaLimpio)) {
+        errores.push("El número de tarjeta debe tener 16 dígitos");
+        document.getElementById("numero-tarjeta").style.borderColor = "#ff0000";
+    } else {
+        document.getElementById("numero-tarjeta").style.borderColor = "#ced4da";
+    }
+    
+    // Validar fecha de expiración (MM/AA)
+    if (!fechaExp) {
+        errores.push("La fecha de expiración es obligatoria");
+        document.getElementById("fecha-exp").style.borderColor = "#ff0000";
+    } else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(fechaExp)) {
+        errores.push("La fecha de expiración debe tener el formato MM/AA");
+        document.getElementById("fecha-exp").style.borderColor = "#ff0000";
+    } else {
+        // Verificar que la fecha no haya expirado
+        const partes = fechaExp.split('/');
+        const mes = parseInt(partes[0], 10);
+        const anio = parseInt(partes[1], 10) + 2000; // Convertir AA a AAAA
+        const fechaActual = new Date();
+        const anioActual = fechaActual.getFullYear();
+        const mesActual = fechaActual.getMonth() + 1;
+        
+        if (anio < anioActual || (anio === anioActual && mes < mesActual)) {
+            errores.push("La tarjeta ha expirado");
+            document.getElementById("fecha-exp").style.borderColor = "#ff0000";
+        } else {
+            document.getElementById("fecha-exp").style.borderColor = "#ced4da";
+        }
+    }
+    
+    // Validar CVV (3 dígitos)
+    if (!cvv) {
+        errores.push("El CVV es obligatorio");
+        document.getElementById("cvv").style.borderColor = "#ff0000";
+    } else if (!/^\d{3}$/.test(cvv)) {
+        errores.push("El CVV debe tener 3 dígitos");
+        document.getElementById("cvv").style.borderColor = "#ff0000";
+    } else {
+        document.getElementById("cvv").style.borderColor = "#ced4da";
+    }
+    
+    // Mostrar errores si los hay
+    if (errores.length > 0) {
         Toastify({
-            text: "Por favor completa todos los campos",
-            duration: 3000,
+            text: errores.join(". ") + ".",
+            duration: 5000,
             close: true,
             gravity: "top",
             position: "center",

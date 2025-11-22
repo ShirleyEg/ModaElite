@@ -5,7 +5,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const nombreUsuario = document.getElementById("nombreUsuario");
     const loginLink = document.querySelector(".boton-login");
     const logoutItem = document.getElementById("logoutItem");
+    const adminItem = document.getElementById("adminItem");
     const logoutBtn = document.getElementById("logoutBtn");
+    
+    // Para depuración
+    console.log("Información de sesión:", sesionInfo);
 
     // Verificar si hay una sesión activa y no ha expirado
     const esSesionValida = sesionInfo && 
@@ -20,6 +24,17 @@ document.addEventListener("DOMContentLoaded", function () {
       // Ocultar botón de login y mostrar botón de logout
       if (loginLink) loginLink.style.display = "none";
       if (logoutItem) logoutItem.style.display = "block";
+      
+      // Mostrar enlace de administrador si el usuario tiene el rol correspondiente
+      if (adminItem) {
+        if (sesionInfo.rol === "administrador") {
+          adminItem.style.display = "block";
+          console.log("Mostrando enlace de administrador");
+        } else {
+          adminItem.style.display = "none";
+          console.log("Usuario no es administrador. Rol:", sesionInfo.rol);
+        }
+      }
     } else {
       // Limpiar sesión expirada
       localStorage.removeItem("usuarioActual");
@@ -27,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Mostrar botón de login
       if (loginLink) loginLink.style.display = "block";
       if (logoutItem) logoutItem.style.display = "none";
+      if (adminItem) adminItem.style.display = "none";
     }
   
     if (logoutBtn) {
