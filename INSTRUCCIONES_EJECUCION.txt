@@ -1,0 +1,82 @@
+INSTRUCCIONES PARA EJECUTAR LA APLICACIÓN
+===========================================
+
+La aplicación necesita ser compilada y ejecutada. Sigue estos pasos:
+
+PASO 1: INSTALAR MAVEN
+---------------------
+1. Descarga Maven desde: https://maven.apache.org/download.cgi
+   - Descarga el archivo: apache-maven-3.9.x-bin.zip
+
+2. Extrae el archivo a una ubicación sin espacios, por ejemplo:
+   C:\apache-maven-3.9.x
+
+3. Agregalo al PATH de Windows:
+   - Abre las Variables de Entorno de Windows
+   - Busca "Variables de entorno"
+   - Haz clic en "Editar las variables de entorno del sistema"
+   - Haz clic en "Variables de entorno..."
+   - En "Variables del sistema", busca "Path" y haz clic en "Editar..."
+   - Haz clic en "Nuevo" y agrega: C:\apache-maven-3.9.x\bin
+   - Haz clic en OK varias veces
+
+4. Verifica que Maven esté instalado correctamente:
+   Abre una nueva terminal PowerShell y ejecuta:
+   mvn --version
+
+PASO 2: COMPILAR EL PROYECTO
+----------------------------
+En PowerShell, navega a la carpeta backend:
+cd C:\Users\Lenovo\Downloads\PredicciónVentasPrendas\backend
+
+Hay dos opciones para compilar:
+
+Opción A (recomendada, sin instalar Maven en sistema):
+1. Ejecuta el instalador local de Maven incluido en el proyecto:
+   PowerShell: `.\install-maven.ps1`
+2. Luego ejecuta el script de arranque que usará la instalación local:
+   PowerShell: `.\run.ps1`
+
+Opción B (si ya tienes Maven en el sistema):
+Ejecuta el siguiente comando para compilar y empaquetar:
+```
+mvn clean package -DskipTests
+```
+
+PASO 3: EJECUTAR LA APLICACIÓN
+------------------------------
+Una vez compilado, ejecuta:
+java -jar target\wekapredictor-0.0.1-SNAPSHOT.jar
+
+PASO 4: ACCEDER A LA APLICACIÓN
+-------------------------------
+Verás en la consola un mensaje como:
+URL: http://localhost:8080
+
+Abre tu navegador y accede a esa URL.
+
+ENDPOINTS DISPONIBLES:
+=====================
+- POST /api/predict       : Predecir ventas de una prenda
+- GET /api/metrics        : Obtener métricas del modelo
+- GET /api/sample         : Obtener una fila de ejemplo del dataset
+- GET /api/export-csv     : Exportar dataset a CSV
+
+EJEMPLO DE PREDICCIÓN:
+====================
+Haz una petición POST a http://localhost:8080/api/predict
+Con el siguiente JSON:
+{
+  "date": "2024-06-15",
+  "category": "Shirt",
+  "size": "M",
+  "color": "Blue",
+  "price": 29.99,
+  "inventory": 50
+}
+
+Recibirás:
+{
+  "prediction": 15.5,
+  "unit": "units"
+}

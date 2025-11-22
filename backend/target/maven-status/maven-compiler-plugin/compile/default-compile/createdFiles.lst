@@ -1,0 +1,5 @@
+com\example\wekapredictor\util\DatasetGenerator.class
+com\example\wekapredictor\service\WekaService.class
+com\example\wekapredictor\model\PredictRequest.class
+com\example\wekapredictor\controller\PredictionController.class
+com\example\wekapredictor\WekaPredictorApplication.class
